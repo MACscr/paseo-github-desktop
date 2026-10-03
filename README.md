@@ -32,15 +32,13 @@ Not affiliated with GitHub. The name describes the layout it borrows.
 
 Requires Paseo **0.11** or later, with plugins enabled (**Settings → Plugins → Enable plugins**) on the host where you install it.
 
-Install it on the daemon host from npm or GitHub:
+Install it on the daemon host from GitHub:
 
 ```bash
-paseo plugin install npm:paseo-github-desktop
-# or
 paseo plugin install github:MACscr/paseo-github-desktop
 ```
 
-You can also paste either source into **Settings → Plugins → Plugin source**.
+Or paste `github:MACscr/paseo-github-desktop` into **Settings → Plugins → Plugin source**.
 
 From a local checkout, for development:
 
