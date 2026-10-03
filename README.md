@@ -32,7 +32,17 @@ Not affiliated with GitHub. The name describes the layout it borrows.
 
 Requires Paseo **0.11** or later, with plugins enabled (**Settings → Plugins → Enable plugins**) on the host where you install it.
 
-From a local checkout, on the daemon machine:
+Install it on the daemon host from npm or GitHub:
+
+```bash
+paseo plugin install npm:paseo-github-desktop
+# or
+paseo plugin install github:MACscr/paseo-github-desktop
+```
+
+You can also paste either source into **Settings → Plugins → Plugin source**.
+
+From a local checkout, for development:
 
 ```bash
 git clone https://github.com/MACscr/paseo-github-desktop.git
@@ -108,3 +118,7 @@ Code is split by runtime, as Paseo requires:
 | `shared/` | Both: RPC contracts and settings schema |
 
 Git runs with `GIT_OPTIONAL_LOCKS=0`, so the panel's background polling never blocks an agent's own git commands.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

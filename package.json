@@ -1,7 +1,6 @@
 {
   "name": "paseo-github-desktop",
-  "private": true,
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A GitHub Desktop-style Git panel for Paseo: Changes, History, diffs, and line comments sent to your agents.",
   "author": "Mark Chaney",
   "repository": {
@@ -38,5 +37,10 @@
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",
     "zod": "^4.4.3"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/MACscr/paseo-github-desktop#readme",
+  "bugs": {
+    "url": "https://github.com/MACscr/paseo-github-desktop/issues"
   }
 }
