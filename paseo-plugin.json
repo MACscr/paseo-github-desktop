@@ -1,0 +1,7 @@
+{
+  "id": "github-desktop",
+  "description": "GitHub Desktop-style Changes and History review for workspace repositories",
+  "requirements": {
+    "paseo": ">=0.11.0-0"
+  }
+}
