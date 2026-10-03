@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { clearCaches, getCommit, getFileDiff, getLog, getStatus } from "../server/repo";
+import { clearCaches, getCommit, getFileDiff, getLog, getStatus, nameFromRemote } from "../server/repo";
 
 let dir: string;
 let repo: string;
@@ -266,3 +266,29 @@ describe("edge cases", () => {
   });
 });
 
+
+describe("repository name", () => {
+  it("reads the name from common remote URL forms", () => {
+    expect(nameFromRemote("git@github.com:acme/widgets.git")).toBe("widgets");
+    expect(nameFromRemote("https://github.com/acme/widgets")).toBe("widgets");
+    expect(nameFromRemote("https://gitlab.example.com/group/sub/widgets.git/\n")).toBe("widgets");
+    expect(nameFromRemote("")).toBeNull();
+  });
+
+  it("names a worktree after its repository, not the worktree folder", async () => {
+    const main = join(dir, "widgets");
+    run(dir, "init", "-q", "-b", "main", main);
+    writeFileSync(join(main, "a.txt"), "a\n");
+    run(main, "add", "-A");
+    run(main, "commit", "-q", "-m", "initial");
+    const worktree = join(dir, "lazy-narwhal");
+    run(main, "worktree", "add", "-q", "-b", "feature", worktree);
+    clearCaches();
+    const fromWorktree = await getStatus({ cwd: worktree });
+    expect(fromWorktree).toMatchObject({ state: "ok", repo: { name: "widgets", root: expect.stringContaining("lazy-narwhal") } });
+
+    run(main, "remote", "add", "origin", "git@github.com:acme/real-name.git");
+    clearCaches();
+    expect(await getStatus({ cwd: worktree })).toMatchObject({ state: "ok", repo: { name: "real-name" } });
+  });
+});

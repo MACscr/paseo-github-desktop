@@ -24,6 +24,8 @@ export type WorkingFile = z.infer<typeof WorkingFile>;
 
 const RepoInfo = z.object({
   root: z.string(),
+  /** The repository's name: from the origin remote, else the main checkout's folder (never a worktree's folder). */
+  name: z.string(),
   /** Null when HEAD is detached. */
   branch: z.string().nullable(),
   /** Null when the branch has no commits yet. */

@@ -1,5 +1,5 @@
 import { stat } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import type { RpcInput, RpcOutput } from "@getpaseo/plugin";
 import type { commitRpc, DiffSource, fileDiffRpc, logRpc, statusRpc } from "../shared/git";
 import { Lru, memoAsync } from "./lru";
@@ -21,6 +21,7 @@ const BASE_CANDIDATES = [
 ];
 
 const roots = new Lru<string, Promise<string>>(64);
+const names = new Lru<string, Promise<string>>(64);
 const emptyTrees = new Lru<string, Promise<string>>(64);
 const commits = new Lru<string, Promise<RpcOutput<typeof commitRpc>>>(500);
 const markers = new Lru<string, Promise<{ notOnBase: Set<string>; unpushed: Set<string> }>>(16);
@@ -31,11 +32,35 @@ const commitDiffs = new Lru<string, DiffResult>(1000, 96 * 1024 * 1024, (value) 
 );
 
 export function clearCaches() {
-  for (const cache of [roots, emptyTrees, commits, markers, refs, commitDiffs]) cache.clear();
+  for (const cache of [roots, names, emptyTrees, commits, markers, refs, commitDiffs]) cache.clear();
 }
 
 function repoRoot(cwd: string): Promise<string> {
   return memoAsync(roots, cwd, async () => (await git(["rev-parse", "--show-toplevel"], { cwd })).stdout.trim());
+}
+
+/** The last path segment of a remote URL, e.g. `git@github.com:acme/widgets.git` → `widgets`. */
+export function nameFromRemote(url: string): string | null {
+  const segment = url.trim().replace(/\/+$/, "").split(/[/:]/).pop();
+  const name = segment?.replace(/\.git$/, "");
+  return name ? name : null;
+}
+
+/**
+ * The repository's own name rather than the checkout folder's, which for a worktree is often a
+ * generated name. Cached per root: remotes and worktree layout almost never change.
+ */
+function repoName(root: string): Promise<string> {
+  return memoAsync(names, root, async () => {
+    const remote = await git(["config", "--get", "remote.origin.url"], { cwd: root, okCodes: [0, 1] });
+    const fromRemote = nameFromRemote(remote.stdout);
+    if (fromRemote) return fromRemote;
+    // A linked worktree shares the main checkout's .git directory; its parent folder is the repository.
+    const common = (await git(["rev-parse", "--path-format=absolute", "--git-common-dir"], { cwd: root })).stdout.trim();
+    if (basename(common) === ".git") return basename(dirname(common));
+    // A bare repository (`widgets.git`) with worktrees elsewhere.
+    return basename(common).replace(/\.git$/, "") || basename(root);
+  });
 }
 
 function emptyTree(root: string): Promise<string> {
@@ -75,6 +100,7 @@ export async function getStatus({ cwd }: RpcInput<typeof statusRpc>): Promise<Rp
       state: "ok",
       repo: {
         root,
+        name: await repoName(root),
         branch: parsed.branch,
         headSha: parsed.headSha,
         upstream: parsed.upstream,

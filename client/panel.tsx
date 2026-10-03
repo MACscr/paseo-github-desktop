@@ -8,7 +8,6 @@ import type { CommitSummary, DiffSource, RepoInfo, WorkingFile } from "../shared
 import { DiffView } from "./diff-view";
 import { ContextMenuProvider, type MenuPoint } from "./context-menu";
 import { GithubDesktopButton, useFileMenu } from "./file-actions";
-import { splitPath } from "./format";
 import { CommitFileList, CommitHeader, CommitList } from "./history";
 import { useCommit, useLog, usePrefetchCommit, useStatus } from "./queries";
 import { commitScope, type ReviewScope } from "./review";
@@ -135,7 +134,7 @@ function Toolbar({
           <View>
             <Text style={label}>Current repository</Text>
             <Text numberOfLines={1} style={value}>
-              {splitPath(repo.root).name}
+              {repo.name}
             </Text>
           </View>
         </View>

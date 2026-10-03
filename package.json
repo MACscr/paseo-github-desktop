@@ -1,6 +1,6 @@
 {
   "name": "paseo-github-desktop",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A GitHub Desktop-style Git panel for Paseo: Changes, History, diffs, and line comments sent to your agents.",
   "author": "Mark Chaney",
   "repository": {
