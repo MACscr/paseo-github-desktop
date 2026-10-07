@@ -14,8 +14,8 @@ import {
 } from "../shared/actions";
 import type { FileStatus } from "../shared/git";
 import { type MenuPoint, MenuItem, MenuSeparator, useContextMenu } from "./context-menu";
+import { GithubMark } from "./github-mark";
 import { tint } from "./theme";
-import { IconButton } from "./ui";
 
 export interface FileTarget {
   path: string;
@@ -45,7 +45,17 @@ export function GithubDesktopButton({ theme, cwd }: { theme: PluginTheme; cwd: s
     onError: (error) => toast.error(`Could not open GitHub Desktop: ${errorMessage(error)}`),
   });
   if (!host.data?.githubDesktop) return null;
-  return <IconButton theme={theme} icon="Github" label="Open in GitHub Desktop" onPress={() => mutation.mutate()} />;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Open in GitHub Desktop"
+      onPress={() => mutation.mutate()}
+      hitSlop={6}
+      style={({ pressed }) => ({ padding: 6, borderRadius: 6, opacity: pressed ? 0.6 : 1 })}
+    >
+      <GithubMark size={15} color={theme.colors.foregroundMuted} />
+    </Pressable>
+  );
 }
 
 export function useOpenInEditor(cwd: string) {

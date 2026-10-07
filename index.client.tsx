@@ -25,7 +25,7 @@ export default function contribute(client: PluginClientContext) {
   const removeGithubDesktop = client.addCommandCenterItem({
     id: "open-github-desktop",
     title: "Open in GitHub Desktop",
-    icon: "Github",
+    icon: "FolderGit2",
     keywords: ["github", "desktop", "repository"],
     context: "workspace",
     async onSelect({ rpc, workspace }) {
